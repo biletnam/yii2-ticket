@@ -44,12 +44,14 @@ use yii\helpers\Url;
 							'class' => 'btn btn-md btn-primary',
 							'style' => 'width:125px'
 					]);
+					/*
 					echo Html::a(
 						'<span class="glyphicon glyphicon-info-sign" aria-hidden=true></span> Info',
 						'/ticket/default', [
 							'class' => 'btn btn-md btn-primary',
 							'style' => 'width:125px'
 					]);
+					*/
 				?>
 			</div>
 		</div> <!--End column-->
