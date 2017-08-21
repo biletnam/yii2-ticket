@@ -54,6 +54,7 @@ $this->title = 'Tickets';
 
 $this->registerJs($this->render('_script_index.js'));
 
+
 \conquer\momentjs\MomentjsAsset::register($this);
 $this->registerJs(<<<JS
 var datetime = null,
@@ -71,6 +72,7 @@ $(document).ready(function(){
 });
 JS
 );
+
 ?>
 
 <div class="ticket-index">
@@ -101,7 +103,7 @@ JS
         </div>
         
         <div class="col-xs-6 text-center">
-			<span id="datetime" style="color: #337ab7; font-size: 25px;" class="text-center"></span>
+            <span id='datetime' style="color: #337ab7; font-size: 25px;" class="text-center" ></span>
         </div>
         
         <div class="col-xs-3 text-right">

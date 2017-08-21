@@ -13,7 +13,7 @@
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
-		"conquer/momentjs": "*"
+        "conquer/momentjs": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "~2.0"
