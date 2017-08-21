@@ -53,6 +53,24 @@ function DateDiffInterval($sDate1, $sDate2, $alt_behavior=false)
 $this->title = 'Tickets';
 
 $this->registerJs($this->render('_script_index.js'));
+
+\conquer\momentjs\MomentjsAsset::register($this);
+$this->registerJs(<<<JS
+var datetime = null,
+        date = null;
+
+var update = function () {
+    date = moment(new Date())
+    datetime.html(date.format('YYYY-MM-DD, H:mm:ss'));
+};
+
+$(document).ready(function(){
+    datetime = $('#datetime')
+    update();
+    setInterval(update, 1000);
+});
+JS
+);
 ?>
 
 <div class="ticket-index">
@@ -83,7 +101,7 @@ $this->registerJs($this->render('_script_index.js'));
         </div>
         
         <div class="col-xs-6 text-center">
-            <?= '<span style="color: #337ab7; font-size: 25px;" class="text-center">'. Date('Y-m-d H:m:s') . '</span>' ?>
+			<span id="datetime" style="color: #337ab7; font-size: 25px;" class="text-center"></span>
         </div>
         
         <div class="col-xs-3 text-right">

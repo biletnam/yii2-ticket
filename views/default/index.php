@@ -36,13 +36,14 @@ $this->title = 'Ticket System';
         $this->title = substr($page, $pos + 1, strrpos($page, '.') - $pos - 1);
     }
     
-    $file = "@frontend/modules/ticket/{$page}";
+    $file = "@bausch/ticket/{$page}";
     //$body = $this->render($file);
     $body = file_get_contents(Url::to($file));
 	
 	//echo $baseDir . '<br/>';
 	//echo Url::current() . '<br/>';
-	echo Url::to('@frontend/modules/ticket/') . '<br/>';
+	echo Url::to($file) . '<br/>';
+	//die();
 	//echo Url::toRoute('ticket') . '<br/>';
     //Replace all the links in a markdown file and make them relative to module.
     $body = preg_replace_callback('/\]\((.*?)\)/', function($matches) use($baseDir) {
