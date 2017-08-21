@@ -140,265 +140,248 @@ JS
 	
 	<div class='row>'>
 		
-		<!--<div class="col-xs-1"></div>-->
-		
 		<div class="col-xs-12">
-		<?php
-		//print_r($searchModel);
-		//print_r($dataProvider->model);
-		?>
-		<?= GridView::widget([
-			'dataProvider' => $dataProvider,
-			'filterModel' => $searchModel,
-			//'emptyCell'=>'-',
-			'formatter' => ['class' => 'yii\i18n\Formatter','nullDisplay' => ''],  //Hide "not set" fields.
-			'tableOptions' => ['class' => 'table'],
-			'rowOptions' => function($model, $key, $index, $grid){
-				$user = (Yii::$app->user->isGuest) ? ''
-					: Yii::$app->user->identity->username;
-				if( $model->taken_by == $user){
-					return ['class' => 'info'];
-				} else if ($model->canceled_at) {
-					return ['class' => 'bg-warning text-muted'];
-				}
-			},
-			'columns' => [
-				//['class' => 'yii\grid\SerialColumn'],
-				[
-					'attribute' => 'ticket_id_pk',
-					'headerOptions' => ['width' => '100'],
-					'label' => 'Ticket #',
-					'format'=> 'ntext',
-				],
-				[
-					'attribute'=> 'process',
-					'headerOptions' => ['width' => '150'],
-				],
-				[
-					'label' => 'Location',
-					'format' => 'raw',
-					'attribute'=>'param1',
-					'value' => 'val1',
-				],
-				[
-					'label' => 'Line',
-					'format' => 'raw',
-					'attribute'=>'param2',
-					'value' => 'val2',
-				],
-				[
-					'label' => 'Machine',
-					'format' => 'raw',
-					'attribute'=>'param3',
-					'value' => 'val3',
-				],
-				[
-					'label' => 'Sec|Station',
-					'format' => 'raw',
-					'attribute'=>'param4',
-					'value' => 'val4',
-				],
-				[
-					'label' => 'Unit',
-					'format' => 'raw',
-					'attribute'=>'param5',
-					'value' => 'val5',
-				],
-				[
-					'label' => 'Wait (Hr:Min)',
-					'format'=> 'html',
-					 'value' => function ($model) {
-						return DateDiffInterval($model->created_at, $model->taken_at, true);
-					 }
-				],
-				[
-					'label' => 'Work (Hr:Min)',
-					'format'=> 'html',
-					 'value' => function ($model) {
-						if (!$model->taken_at) {
-							return '';
-						} else {
-							return DateDiffInterval($model->taken_at, $model->closed_at, true);
-						}
-					 }
-				],
-				[
-					'label' => 'Total(Hr:Min)',
-					'format'=> 'html',
-					 'value' => function ($model) {
-						return DateDiffInterval($model->created_at, $model->closed_at);
-					 }
-				],
-				[
-					'class' => 'yii\grid\DataColumn',
-					'headerOptions' => ['width' => '100'],
-					'contentOptions' => ['class' => 'text-center'],
-					'filter'=> array('Up'=>'Up','Down'=>'Down', 'N/A' =>'N/A'),
-					'attribute' => 'machine_status',
-					'label' => 'Machine Status',
-					'format'=> 'raw',
-					'value' => function ($model) {
-						switch (strtolower($model->machine_status)) {
-							case 'up':
-								$rs = Html::button('<span class="glyphicon glyphicon-arrow-up"><span>',[
-									'class' => 'btn btn-default btn-sm',
-									'data-toggle' => 'tooltip',
-									'title'=> "Machine Running",
-								]);
-								break;
-							case 'down':
-								$rs = Html::button('<span class="glyphicon glyphicon-arrow-down"><span>', [
-									'class' => 'btn btn-danger btn-sm',
-									'data-toggle' => 'tooltip',
-									'title'=> "Machine Down.",
-								]);
-								break;
-							default :
-								$rs = "";
-								break;
-						}
-						return $rs;
-					},
-				],
-				[
-					'attribute' => 'as_reported',
-					'headerOptions' => ['width' => '250'],
-					'label' => 'As Reported',
-					'format'=> 'ntext',
-				],
-				
-	//			[
-	//                'name' => 'Obj',
-	//                'value' => 'ticketData.Obj',
-	//            ],   
-				//'as_determined: ntext',
-				//'applied_fix: ntext',
-				//[
-				//    'class' => 'yii\grid\DataColumn',
-				//    'attribute' => 'test',
-				//    'label' => 'test',
-				//    'format'=> 'html',
-				//    'value' => function($model){
-				//        $tmp_r = array('<div><b>as_reported</b>'.$model->as_reported.'</div>',$model->as_determined,$model->applied_fix);
-				//        return implode('<br/>', $tmp_r);
-				//    },
-				//],
-				[
-					'attribute' => 'ticket_status',
-					'headerOptions' => ['width' => '100'],
-					'filter'=>array(
-							'Open'=>'Open',
-							'In Repair'=>'In Repair',
-							'Closed' =>'Closed',
-							'Canceled' =>'Canceled'),
-					'label' => 'Ticket Status',
-					'format'=> 'ntext',
-				],            
-				//'taken_by',
-				//'taken_at',
-				//'closed_by',
-				//'closed_at',
-				//'canceled_by',
-				//'canceled_at',
-				//'created_by',
-				//'created_at',
-				[
-					'class' => 'yii\grid\ActionColumn',
-					'template' => Helper::filterActionColumn('{take} {cancel} {view} {update}'),
-					'filterOptions' => ['id'=>'spawn_reset_btn'],
-					'header' => Html::button(Html::a('<span class="glyphicon glyphicon-remove"></span>Clear Filter', ['ticket/index']), [
-									'class' => 'btn btn-sm btn-default',
-									'style' => 'width: 100px;',
-									'onclick' => 'window.location=""',
-								]),
-					'buttons' => [
-						'take' => function ($url, $model) {
-							if ($model->ticket_status == $model::TKT_STATUS_OPEN){
-								return Html::button('<span class="glyphicon glyphicon-tag"></span>Take',
-									['value' => Url::to(['ticket/take', 'id'=>$model->ticket_id_pk]),
-									 'class' => 'showModalButton btn btn-sm btn-danger',
-									 'style' => 'width: 75px;',
-									 'title'=> 'Assign Ticket',
-									 'data-toggle' => 'tooltip',
-									 'data-selector' => 'true',
-									 'data-title' => 'Click to accept ticket.',
-									]);
-							} elseif ($model->ticket_status == $model::TKT_STATUS_CLOSED) {
-								return Html::button('<span class="glyphicon glyphicon-edit"></span>Open',
-									['value' => Url::to(['ticket/open', 'id'=>$model->ticket_id_pk]),
-									 'class' => 'showModalButton btn btn-sm btn-info',
-									 'style' => 'width: 75px;',
-									 'title' => 'ReOpen Ticket',
-									 'data-toggle'   => 'tooltip',
-									 'data-selector' => 'true',
-									 'data-title'    => 'Click to re-open the ticket.',
-									 ]);
-							} else{
-								return Html::button('<span class="glyphicon glyphicon-tag"></span>Close',
-									['value' => Url::to(['ticket/close', 'id'=>$model->ticket_id_pk]),
-									 'class' => 'showModalButton btn btn-sm btn-primary',
-									 'style' => 'width: 75px;',
-									 'title' => 'Close Ticket',
-									 'data-toggle'   => 'tooltip',
-									 'data-selector' => 'true',
-									 'data-title'    => 'Click to close ticket.',
-									 ]);
-							}
-						},
-						'cancel' => function ($url, $model) {
-							if ($model->ticket_status == $model::TKT_STATUS_CLOSED) {
-								return '';
-							} elseif ($model->ticket_status == $model::TKT_STATUS_CANCELED) {
-								return '';
-							}
-							return Html::button('<span class="glyphicon glyphicon-ban-circle"></span>',
-									['value' => Url::to(['ticket/cancel', 'id'=>$model->ticket_id_pk]),
-									 'class' => 'showModalButton btn btn-sm btn-default',
-									 //'style' => 'width: 75px;',
-									 'title '=> 'Cancel Ticket',
-									 'data-toggle'   => 'tooltip',
-									 'data-selector' => 'true',
-									 'data-title'    => 'Click to cancel ticket.',
-									 ]);
-						},
-						'view' => function ($url, $model) {
-							return Html::button('<span class="glyphicon glyphicon-eye-open"></span>',
-									['value' => Url::to(['ticket/view', 'id'=>$model->ticket_id_pk]),
-									 'class' => 'showModalButton btn btn-sm btn-default',
-									 //'style' => 'width: 75px;',
-									 'title' => "Ticket View",
-									 'data-toggle'   => 'tooltip',
-									 'data-selector' => 'true',
-									 'data-title'    => 'Click to view record details.',
-									 ]);
-						},
-						'update' => function ($url, $model) {
-							if ($model->ticket_status == $model::TKT_STATUS_CLOSED) {
-								return '';
-							} elseif ($model->ticket_status == $model::TKT_STATUS_CANCELED) {
-								return '';
-							}
-							return Html::button('<span class="glyphicon glyphicon-pencil"></span>',
-									['value' => Url::to(['ticket/update', 'id'=>$model->ticket_id_pk]),
-									 'class' => 'showModalButton btn btn-sm btn-default',
-									 //'style' => 'width: 75px;',
-									 'title'=> 'Update Ticket',
-									 'data-toggle'   => 'tooltip',
-									 'data-selector' => 'true',
-									 'data-title'    => 'Click to update record.',
-									 ]);
-						},
-					], // End of action buttons 
-				], // End of actionColumn
-				// ['class' => 'yii\grid\ActionColumn'],
-			],
-			//'layout' => "{items}\n{pager}",         //'layout' => "{summary}\n{pager}\n{items}\n{pager}",
 			
-		]); ?>
-		</div>
+			<?= GridView::widget([
+				'dataProvider' => $dataProvider,
+				'filterModel' => $searchModel,
+				//'emptyCell'=>'-',
+				'formatter' => ['class' => 'yii\i18n\Formatter','nullDisplay' => ''],  //Hide "not set" fields.
+				'tableOptions' => ['class' => 'table'],
+				'rowOptions' => function($model, $key, $index, $grid){
+					$user = (Yii::$app->user->isGuest) ? ''
+						: Yii::$app->user->identity->username;
+					if( $model->taken_by == $user){
+						return ['class' => 'info'];
+					} else if ($model->canceled_at) {
+						return ['class' => 'bg-warning text-muted'];
+					}
+				},
+				'columns' => [
+					[
+						'attribute' => 'ticket_id_pk',
+						'headerOptions' => ['width' => '100'],
+						'label' => 'Ticket #',
+						'format'=> 'ntext',
+					],
+					[
+						'attribute'=> 'process',
+						'headerOptions' => ['width' => '150'],
+					],
+					[
+						'label' => 'Location',
+						'format' => 'raw',
+						'attribute'=>'param1',
+						'value' => 'val1',
+						'headerOptions' => ['width' => '100'],
+					],
+					[
+						'label' => 'Line',
+						'format' => 'raw',
+						'attribute'=>'param2',
+						'value' => 'val2',
+						'headerOptions' => ['width' => '100'],
+					],
+					[
+						'label' => 'Machine',
+						'format' => 'raw',
+						'attribute'=>'param3',
+						'value' => 'val3',
+						'headerOptions' => ['width' => '100'],
+					],
+					[
+						'label' => 'Sec|Station',
+						'format' => 'raw',
+						'attribute'=>'param4',
+						'value' => 'val4',
+						'headerOptions' => ['width' => '100'],
+					],
+					[
+						'label' => 'Unit',
+						'format' => 'raw',
+						'attribute'=>'param5',
+						'value' => 'val5',
+						'headerOptions' => ['width' => '100'],
+					],
+					[
+						'label' => 'Downtime (Hr:Min)',
+						'format'=> 'html',
+						 'value' => function ($model) {
+							$wait  = DateDiffInterval($model->created_at, $model->taken_at, true);
+							$work  = (!$model->taken_at) ? '' : DateDiffInterval($model->taken_at, $model->closed_at, true);
+							$total = DateDiffInterval($model->created_at, $model->closed_at);
+							$tbl = "<table>";
+							$tbl .= "<tr><th style='text-align:right'>Wait: </th><td>&nbsp;" . $wait . "</td></tr>";
+							$tbl .= "<tr><th style='text-align:right'>Work: </th><td>&nbsp;" . $work . "</td></tr>";
+							$tbl .= "<tr><th style='text-align:right'>Total: </th><td>&nbsp;" . $total . "</td></tr>";
+							$tbl .= "</table>";
+							return $tbl;
+						 },
+						 'headerOptions' => ['width' => '100'],
+					],
+					[
+						'class' => 'yii\grid\DataColumn',
+						'headerOptions' => ['width' => '100'],
+						'contentOptions' => ['class' => 'text-center'],
+						'filter'=> array('Up'=>'Up','Down'=>'Down', 'N/A' =>'N/A'),
+						'attribute' => 'machine_status',
+						'label' => 'Machine Status',
+						'format'=> 'raw',
+						'value' => function ($model) {
+							switch (strtolower($model->machine_status)) {
+								case 'up':
+									$rs = Html::button('<span class="glyphicon glyphicon-arrow-up"><span>',[
+										'class' => 'btn btn-default btn-sm',
+										'data-toggle' => 'tooltip',
+										'title'=> "Machine Running",
+									]);
+									break;
+								case 'down':
+									$rs = Html::button('<span class="glyphicon glyphicon-arrow-down"><span>', [
+										'class' => 'btn btn-danger btn-sm',
+										'data-toggle' => 'tooltip',
+										'title'=> "Machine Down.",
+									]);
+									break;
+								default :
+									$rs = "";
+									break;
+							}
+							return $rs;
+						},
+					],
+					[
+					    'class' => 'yii\grid\DataColumn',
+					    'attribute' => 'as_reported',
+					    'label' => 'Description',
+					    'format'=> 'html',
+					    'value' => function($model){
+							$tmp_r = [];
+					        if($model->as_reported)   $tmp_r[] = '<b>Reported: </b><br/>' . $model->as_reported . '<br/>';
+							if($model->as_determined) $tmp_r[] = '<b>Determined: </b><br/>' . $model->as_determined . '<br/>';
+							if($model->applied_fix)   $tmp_r[] = '<b>Applied Fix: </b><br/>' . $model->applied_fix . '<br/>';
+							return implode('--------------<br/>', $tmp_r);
+					    },
+						'headerOptions' => ['width' => '300'],
+					],
+					[
+						'attribute' => 'ticket_status',
+						'headerOptions' => ['width' => '100'],
+						'filter'=>array(
+								'Open'=>'Open',
+								'In Repair'=>'In Repair',
+								'Closed' =>'Closed',
+								'Canceled' =>'Canceled'),
+						'label' => 'Ticket Status',
+						'format'=> 'ntext',
+					],            
+					[
+						'class' => 'yii\grid\ActionColumn',
+						'template' => Helper::filterActionColumn('{take} {log} {cancel} {view} {update}'),
+						'filterOptions' => ['id'=>'spawn_reset_btn'],
+						'header' => Html::button(Html::a('<span class="glyphicon glyphicon-remove"></span>Clear Filter', ['ticket/index']), [
+										'class' => 'btn btn-sm btn-default',
+										'style' => 'width: 100px;',
+										'onclick' => 'window.location=""',
+									]),
+						'buttons' => [
+							'take' => function ($url, $model) {
+								if ($model->ticket_status == $model::TKT_STATUS_OPEN){
+									return Html::button('<span class="glyphicon glyphicon-tag"></span>Take',
+										['value' => Url::to(['ticket/take', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-danger',
+										 'style' => 'width: 75px;',
+										 'title'=> 'Assign Ticket',
+										 'data-toggle' => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title' => 'Click to accept ticket.',
+										]);
+								} elseif ($model->ticket_status == $model::TKT_STATUS_CLOSED) {
+									return Html::button('<span class="glyphicon glyphicon-edit"></span>Open',
+										['value' => Url::to(['ticket/open', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-info',
+										 'style' => 'width: 75px;',
+										 'title' => 'ReOpen Ticket',
+										 'data-toggle'   => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title'    => 'Click to re-open the ticket.',
+										 ]);
+								} else{
+									return Html::button('<span class="glyphicon glyphicon-tag"></span>Close',
+										['value' => Url::to(['ticket/close', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-primary',
+										 'style' => 'width: 75px;',
+										 'title' => 'Close Ticket',
+										 'data-toggle'   => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title'    => 'Click to close ticket.',
+										 ]);
+								}
+							},
+							'cancel' => function ($url, $model) {
+								if ($model->ticket_status == $model::TKT_STATUS_CLOSED) {
+									return '';
+								} elseif ($model->ticket_status == $model::TKT_STATUS_CANCELED) {
+									return '';
+								}
+								return Html::button('<span class="glyphicon glyphicon-ban-circle"></span>',
+										['value' => Url::to(['ticket/cancel', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-default',
+										 //'style' => 'width: 75px;',
+										 'title '=> 'Cancel Ticket',
+										 'data-toggle'   => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title'    => 'Click to cancel ticket.',
+										 ]);
+							},
+							'view' => function ($url, $model) {
+								return Html::button('<span class="glyphicon glyphicon-eye-open"></span>',
+										['value' => Url::to(['ticket/view', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-default',
+										 //'style' => 'width: 75px;',
+										 'title' => "Ticket View",
+										 'data-toggle'   => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title'    => 'Click to view record details.',
+										 ]);
+							},
+							'update' => function ($url, $model) {
+								if ($model->ticket_status == $model::TKT_STATUS_CLOSED) {
+									return '';
+								} elseif ($model->ticket_status == $model::TKT_STATUS_CANCELED) {
+									return '';
+								}
+								return Html::button('<span class="glyphicon glyphicon-pencil"></span>',
+										['value' => Url::to(['ticket/update', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-default',
+										 //'style' => 'width: 75px;',
+										 'title'=> 'Update Ticket',
+										 'data-toggle'   => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title'    => 'Click to update record.',
+										 ]);
+							},
+							'log' => function ($url, $model) {
+								return Html::button('<span class="glyphicon glyphicon-book"></span>',
+										['value' => Url::to(['ticket/log', 'id'=>$model->ticket_id_pk]),
+										 'class' => 'showModalButton btn btn-sm btn-default',
+										 //'style' => 'width: 75px;',
+										 'title'=> 'Update Ticket',
+										 'data-toggle'   => 'tooltip',
+										 'data-selector' => 'true',
+										 'data-title'    => 'Click to update record.',
+										 ]);
+							},
+						], // End of action buttons 
+					], // End of actionColumn
+				],
+				'layout' => "{errors}\n{summary}\n{pager}\n{items}\n{pager}",
+			]); ?>
+			
+		</div> <!--End of Col-->
 		
-		<!--<div class="col-xs-1"></div>-->
-		
-	</div>
+	</div> <!--End of Row-->
+	
 	<?php Pjax::end(); ?>
-</div>
+	
+</div> <!--End of ticket-index-->
