@@ -16,7 +16,6 @@ class Module extends \yii\base\Module
 {
     /**
      * @var string Main layout using for module. Default to layout of parent module.
-     * Its used when `layout` set to 'left-menu', 'right-menu' or 'top-menu'.
      */
     //public $mainLayout = '@mdm/admin/views/layouts/main.php';
     

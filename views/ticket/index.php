@@ -140,7 +140,9 @@ JS
 	
 	<div class='row>'>
 		
-		<div class="col-xs-12">
+		<div class="col-xs-1">
+		</div>
+		<div class="col-xs-10">
 			
 			<?= GridView::widget([
 				'dataProvider' => $dataProvider,
@@ -160,48 +162,48 @@ JS
 				'columns' => [
 					[
 						'attribute' => 'ticket_id_pk',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 						'label' => 'Ticket #',
 						'format'=> 'ntext',
 					],
 					[
 						'attribute'=> 'process',
-						'headerOptions' => ['width' => '150'],
+						//'headerOptions' => ['width' => '150'],
 					],
 					[
 						'label' => 'Location',
 						'format' => 'raw',
 						'attribute'=>'param1',
 						'value' => 'val1',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 					],
 					[
 						'label' => 'Line',
 						'format' => 'raw',
 						'attribute'=>'param2',
 						'value' => 'val2',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 					],
 					[
 						'label' => 'Machine',
 						'format' => 'raw',
 						'attribute'=>'param3',
 						'value' => 'val3',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 					],
 					[
 						'label' => 'Sec|Station',
 						'format' => 'raw',
 						'attribute'=>'param4',
 						'value' => 'val4',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 					],
 					[
 						'label' => 'Unit',
 						'format' => 'raw',
 						'attribute'=>'param5',
 						'value' => 'val5',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 					],
 					[
 						'label' => 'Downtime (Hr:Min)',
@@ -217,7 +219,7 @@ JS
 							$tbl .= "</table>";
 							return $tbl;
 						 },
-						 'headerOptions' => ['width' => '100'],
+						 //'headerOptions' => ['width' => '100'],
 					],
 					[
 						'class' => 'yii\grid\DataColumn',
@@ -262,11 +264,11 @@ JS
 							if($model->applied_fix)   $tmp_r[] = '<b>Applied Fix: </b><br/>' . $model->applied_fix . '<br/>';
 							return implode('--------------<br/>', $tmp_r);
 					    },
-						'headerOptions' => ['width' => '300'],
+						//'headerOptions' => ['width' => '300'],
 					],
 					[
 						'attribute' => 'ticket_status',
-						'headerOptions' => ['width' => '100'],
+						//'headerOptions' => ['width' => '100'],
 						'filter'=>array(
 								'Open'=>'Open',
 								'In Repair'=>'In Repair',
@@ -379,6 +381,9 @@ JS
 			]); ?>
 			
 		</div> <!--End of Col-->
+		
+		<div class="col-xs-1">
+		</div>
 		
 	</div> <!--End of Row-->
 	

@@ -7,6 +7,7 @@ use yii\helpers\Html;
 
 $this->title = 'Tickets';
 
+$show_limit = 10;
 ?>
 
 <div class="ticket-index">
@@ -103,7 +104,7 @@ $this->title = 'Tickets';
 				  , y5.val 
 				ORDER BY 
 					cnt DESC
-				LIMIT 10
+				LIMIT $show_limit
 				;
 			";
 			$params = [':from_date' => $model->from_date . '00:00:00', ':to_date' => $model->to_date. '23:59:59'];
@@ -111,7 +112,7 @@ $this->title = 'Tickets';
 			?>
 			
 			<?php if(count($data)>0) : ?>
-				<h2>Top 5 Reoccurring Offenders</h2>
+				<h2>Top <?= $show_limit ?> Reoccurring Offenders</h2>
 		
 				<?php
 					$from = strtotime($model->from_date);
